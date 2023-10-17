@@ -52,7 +52,7 @@ export async function fetchPosts(pageNumber = 1, pageSize = 20) {
             populate: {
                 path: 'author',
                 model: User,
-                select: "_id name parentId image"
+                select: "_id username parentId image"
             }
         })
 
