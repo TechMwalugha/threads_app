@@ -19,19 +19,26 @@ export default async function Home() {
           <p className="no-result">No threads found</p>
         ): (
           <>
-          {result?.posts.map((post) => (
-            <ThreadCard
-            key={post._id}
-            id={post._id}
-            currentUserId={user?.id || ""}
-            parentId={post.parentId}
-            content={post.text}
-            author={post.author}
-            community={post.community}
-            createdAt={post.createdAt}
-            comments={post.children}
-            />
-          ))}
+          {result?.posts.map((post) => 
+          {
+            if(post.parentId !== undefined) return
+            return (
+            
+              <ThreadCard
+              key={post._id}
+              id={post._id}
+              currentUserId={user?.id || ""}
+              parentId={post.parentId}
+              content={post.text}
+              author={post.author}
+              community={post.community}
+              createdAt={post.createdAt}
+              comments={post.children}
+              /> 
+            )
+          }
+          
+          )}
           </>
         )}
       </section>
