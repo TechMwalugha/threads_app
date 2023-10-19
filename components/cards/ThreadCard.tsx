@@ -93,11 +93,13 @@ const ThreadCard = ({
                 { /* TODO DeleteThread */}
                 { /* TODO show comment logo */}
 
-                {!isComment && community && (
+            </div>
+
+            {!isComment && community && (
                     <Link href={`/communities/${community.id}`} className="mt-5 flex items-center">
                         <p className="text-subtle-medium text-gray-1">
                             {formatDateString(createdAt)}
-                            - {community.name} Community 
+                             {" "} - {community.name} Community 
 
                             <Image 
                              src={community.image}
@@ -109,8 +111,6 @@ const ThreadCard = ({
                         </p>
                     </Link>
                 )}
-
-            </div>
         </article>
     )
 }
