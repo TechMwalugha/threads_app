@@ -1,14 +1,19 @@
-import PostThread from '@/components/forms/PostThread'
-import ProfileHeader from '@/components/shared/ProfileHeader'
-import { fetchUser, fetchUsers } from '@/lib/actions/user.action'
-import { currentUser } from '@clerk/nextjs'
-import { redirect } from 'next/navigation'
-import { profileTabs } from '@/constants'
-import Image from 'next/image'
-import ThreadsTab from '@/components/shared/ThreadsTab'
-import UserCard from '@/components/cards/UserCard'
+import { redirect } from "next/navigation";
+import { currentUser } from "@clerk/nextjs";
 
-const Page = async () => {
+import UserCard from "@/components/cards/UserCard";
+import SearchBar from "@/components/shared/SearchBar";
+import Pagination from "@/components/shared/Pagination";
+
+import { fetchUser, fetchUsers } from "@/lib/actions/user.action";
+
+const Page = async ({
+  searchParams,
+}: {
+  searchParams: {
+    [key: string]: string | undefined
+  }
+}) => {
 
     const user =  await currentUser()
 
@@ -19,18 +24,20 @@ const Page = async () => {
     if(!userInfo.onboarded) redirect('/onboarding')
 
     //Fetch users
-    const result = await fetchUsers({
+     const result = await fetchUsers({
       userId: user.id,
-      searchString: '',
-      pageNumber: 1,
+      searchString: searchParams?.q,
+      pageNumber: searchParams?.page ? +searchParams.page : 1,
       pageSize: 25,
     })
+
 
   return (
     <section>
       <h1 className="head-text mb-10">Search</h1>
 
-      {/* SearchBar*/}
+      {/* SearchBar */}
+      <SearchBar routeType='search' />
 
       <div className='mt-14 flex flex-col gap-9'>
         {result.users.length === 0 ? (
@@ -50,6 +57,12 @@ const Page = async () => {
           </>
         )}
       </div>
+
+      <Pagination
+        path='search'
+        pageNumber={searchParams?.page ? +searchParams.page : 1}
+        isNext={result.isNext}
+      />
     </section>
   )
 }
