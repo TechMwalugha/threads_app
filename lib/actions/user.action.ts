@@ -181,3 +181,69 @@ export async function getActivity(userId: string) {
     throw error;
   }
 }
+
+export async function fetchSuggestedUsers(userId: string) {
+  try {
+    connectToDB()
+    // Fetch a list of suggested users based on their activity in the past week
+    const suggestedUsers = await User.aggregate([
+      {
+        $match: {
+          id: { $ne: userId }, // Exclude the current user from the results
+        },
+      },
+      {
+        $lookup: {
+          from: "threads",
+          localField: "id",
+          foreignField: "author",
+          as: "threads",
+        },
+      },
+      {
+        $lookup: {
+          from: "threads",
+          localField: "id",
+          foreignField: "children",
+          as: "replies",
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          image: 1,
+          id: 1,
+          username: 1,
+          activity: {
+            $size: {
+              $filter: {
+                input: {
+                  $concatArrays: ["$threads", "$replies"],
+                },
+                as: "thread",
+                cond: {
+                  $gt: [
+                    "$$thread.createdAt",
+                    new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Filter threads created in the past week
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $sort: {
+          activity: -1, // Sort by activity in descending order
+        },
+      },
+      {
+        $limit: 5, // Limit the number of suggested users to 5
+      },
+    ]);
+
+    return suggestedUsers
+  } catch (error: any) {
+    throw new Error(`Error occurred: ${error.message}`)
+  }
+}

@@ -1,4 +1,4 @@
-import { CLERK_JS_URL } from '@clerk/nextjs/server';
+
 import mongoose from 'mongoose'
 
 let isConnected = false
